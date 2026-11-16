@@ -53,6 +53,10 @@ p{margin:0}
 .sync-dot.ok{background:var(--t-xmas)} .sync-dot.err{background:var(--red)} .sync-dot.busy{background:var(--gold)}
 
 /* tonight */
+.logbar{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;width:100%;text-align:left;margin:2px 0 14px;padding:12px 16px 12px 12px;border-radius:var(--r-l);border:1.5px solid var(--gold);background:transparent}
+.logbar svg{width:24px;height:24px;color:var(--gold);justify-self:center}
+.logbar b{font-size:1.05rem}
+.subh{font-size:.9rem;color:var(--frost-dim);margin:16px 0 2px}
 .tonight{position:relative;margin-top:6px;border-radius:var(--r-l);background:var(--fir);overflow:hidden;display:grid;grid-template-columns:132px 1fr;gap:16px;padding:16px}
 .tonight .poster{width:132px;aspect-ratio:2/3;border-radius:var(--r-m)}
 .tonight .pp{border:0;padding:0;background:none;align-self:start}
@@ -583,7 +587,9 @@ function renderTonight(){
   } else if (plan.pool.length){
     cal = `<div class="section-h"><h2>Winter films to finish</h2></div><div class="list">${plan.pool.map(rowHTML).join("")}</div>`;
   }
-  return hero + chips + cal;
+  const logBtn = `<button class="logbar" data-action="openLog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/></svg>
+    <span><b>Log a film</b><span class="muted small" style="display:block">Search your list or any film, then mark it as watched and rate it</span></span></button>`;
+  return logBtn + hero + chips + cal;
 }
 function door(sl){
   const d = parse(sl.date), xmas = sl.date.slice(5) === "12-25";
@@ -727,9 +733,10 @@ function seasonRow(f, yr){
 function openSheet(html, label){
   document.getElementById("sheetBody").innerHTML = html;
   const sh = document.getElementById("sheet");
+  const same = sh.classList.contains("open") && sh.getAttribute("aria-label") === (label || "Details");
   sh.setAttribute("aria-label", label || "Details");
   document.getElementById("scrim").classList.add("open"); sh.classList.add("open");
-  sh.scrollTop = 0;
+  if (!same) sh.scrollTop = 0;
 }
 function closeSheet(){
   document.getElementById("scrim").classList.remove("open"); document.getElementById("sheet").classList.remove("open");
@@ -866,6 +873,127 @@ function drawSettings(){
       <button class="linkbtn" style="margin-top:14px;color:${sheetCtx.resetConfirm ? "#ff8f9c" : "var(--frost-dim)"}" data-action="reset">${sheetCtx.resetConfirm ? "Tap again to replace everything with the original sheet data" : "Start again from my original sheet"}</button></div>`, "Settings");
 }
 
+/* ---------------- quick log: search -> watched + rating ---------------- */
+let logTimer = null, logSeq = 0;
+function openLog(){
+  sheetCtx = {kind:"log", q:"", tmdb:null, tmdbErr:""};
+  openSheet(`<h2>Log a film</h2>
+    <div class="search" style="margin-top:14px"><input id="logQ" type="search" placeholder="Search your films or any film" aria-label="Search films" autocomplete="off" enterkeyhint="search"></div>
+    <div id="logResults"></div>`, "Log a film");
+  drawLogResults();
+  setTimeout(() => { const i = document.getElementById("logQ"); i && i.focus(); }, 300);
+}
+function drawLogResults(){
+  const c = sheetCtx, el = document.getElementById("logResults"); if (!el || c.kind !== "log") return;
+  const q = c.q.trim().toLowerCase();
+  let out = "";
+  if (!q){
+    const recent = [...data.films].filter(f => f.watches.length).sort((a,b) => (lastWatch(b) > lastWatch(a) ? 1 : -1)).slice(0, 6);
+    const plan = buildPlan("").slots.flatMap(x => x.films).slice(0, 4);
+    out += `<p class="subh">Up next in your countdown</p><div class="list">${plan.map(logRowMine).join("")}</div>`;
+    if (recent.length) out += `<p class="subh">Recently watched</p><div class="list">${recent.map(logRowMine).join("")}</div>`;
+    return el.innerHTML = out;
+  }
+  const mine = data.films.filter(f => f.title.toLowerCase().includes(q) || (f.sheetName || "").toLowerCase().includes(q)).slice(0, 8);
+  out += `<p class="subh">In your films</p>` + (mine.length ? `<div class="list">${mine.map(logRowMine).join("")}</div>` : `<p class="muted small" style="padding:6px 0">None of your films match.</p>`);
+  if (!data.tmdbKey) out += `<p class="muted small" style="margin-top:14px">Add a TMDB key in Settings to search for films that aren't on your list yet.</p>`;
+  else {
+    out += `<p class="subh">New to your list</p>`;
+    if (c.tmdbErr) out += `<p class="status err">${esc(c.tmdbErr)}</p>`;
+    else if (!c.tmdb || c.tmdb.q !== c.q) out += `<p class="muted small" style="padding:6px 0">Searching TMDB…</p>`;
+    else {
+      const have = new Set(data.films.map(f => f.tmdbId));
+      const norm = t => (t || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const mineKey = new Set(data.films.map(f => norm(f.title) + "|" + (f.year || "")));
+      const mineTitle = new Set(data.films.filter(f => !f.year).map(f => norm(f.title)));
+      const res = c.tmdb.results.filter(m => !have.has(m.id) && !mineKey.has(norm(m.title) + "|" + (m.release_date || "").slice(0,4)) && !mineTitle.has(norm(m.title))).slice(0, 8);
+      out += res.length ? `<div class="list">${res.map(m => `<button class="row" data-logtmdb="${m.id}">${posterHTML(m.poster_path, m.title, "w92")}
+        <span><span class="t">${esc(m.title)}${m.release_date ? ` (${m.release_date.slice(0,4)})` : ""}</span><span class="s" style="display:block">${esc((m.overview || "").slice(0, 80))}${(m.overview || "").length > 80 ? "…" : ""}</span></span><span class="svc">New</span></button>`).join("")}</div>`
+        : `<p class="muted small" style="padding:6px 0">No other films found.</p>`;
+    }
+  }
+  el.innerHTML = out;
+}
+function logRowMine(f){
+  return `<button class="row" data-logpick="${f.id}">${posterHTML(f.poster, f.title, "w92")}
+    <span><span class="t">${esc(f.title)}</span><span class="s" style="display:block">${esc(TIER[f.tier].name)}. ${esc(watchedLine(f))}</span></span>
+    ${watchedThisSeason(f) ? `<span class="tick" title="Watched this season">${check}</span>` : "<span></span>"}</button>`;
+}
+function onLogQuery(v){
+  const c = sheetCtx; c.q = v; c.tmdbErr = ""; drawLogResults();
+  clearTimeout(logTimer);
+  if (!data.tmdbKey || v.trim().length < 2) return;
+  const seq = ++logSeq;
+  logTimer = setTimeout(async () => {
+    try {
+      const r = await tmdb("/search/movie", {query:v.trim()});
+      if (seq !== logSeq || !sheetCtx || sheetCtx.kind !== "log") return;
+      sheetCtx.tmdb = {q:v, results:r.results};
+    } catch (e){ if (sheetCtx && sheetCtx.kind === "log") sheetCtx.tmdbErr = e.message; }
+    drawLogResults();
+  }, 350);
+}
+function openLogFilm(opts){
+  const back = sheetCtx && sheetCtx.kind === "log" ? {q:sheetCtx.q, tmdb:sheetCtx.tmdb} : null;
+  if (opts.filmId){
+    const f = byId(opts.filmId);
+    sheetCtx = {kind:"logfilm", filmId:f.id, tier:f.tier, service:f.service, date:today(), back};
+  } else {
+    const m = (back && back.tmdb ? back.tmdb.results : []).find(x => x.id === opts.tmdbId) || {id:opts.tmdbId, title:""};
+    const dup = data.films.find(f => f.tmdbId === m.id);
+    if (dup) return openLogFilm({filmId:dup.id});
+    sheetCtx = {kind:"logfilm", movie:m, tier:"undecided", service:"", date:today(), back};
+    Promise.all([tmdb(`/movie/${m.id}`), providers(m.id)]).then(([det, list]) => {
+      if (!sheetCtx || sheetCtx.movie !== m) return;
+      sheetCtx.movie = det; if (!sheetCtx.service) sheetCtx.service = mapService(list); sheetCtx.list = list; drawLogFilm();
+    }).catch(() => {});
+  }
+  drawLogFilm();
+}
+function drawLogFilm(){
+  const c = sheetCtx, f = c.filmId ? byId(c.filmId) : null, m = c.movie || {};
+  const title = f ? f.title : m.title, poster = f ? f.poster : m.poster_path;
+  const yr = f ? f.year : (m.release_date ? m.release_date.slice(0,4) : "");
+  const cur = season().year, ly = seasonOf(c.date); c._ly = ly;
+  const sub = f ? `${esc(watchedLine(f))}${watchedThisSeason(f) ? ". Already watched this season" : ""}` : `New to your list${c.list ? (c.list.length ? ". UK streaming: " + esc(c.list.join(", ")) : "") : ""}`;
+  openSheet(`${c.back ? `<button class="linkbtn" data-action="logBack" style="margin-bottom:10px">Back to search</button>` : ""}
+    <div class="head">${posterHTML(poster, title || "")}
+    <div><h2>${esc(title || "")}</h2><p class="muted" style="margin-top:6px">${esc(yr || "")}</p><p class="small muted" style="margin-top:10px">${sub}</p></div></div>
+    <div class="blk"><h3>When did you watch it?</h3>
+      <div class="choices">${[cur, cur-1, cur-2].map(y => `<button class="choice" data-lgyear="${y}" aria-pressed="${ly === y}">${y === cur ? "This season" : y}</button>`).join("")}</div>
+      <div class="inline" style="margin-top:10px"><input type="date" id="lgDate" value="${c.date}" aria-label="Date watched" style="min-height:48px;border-radius:var(--r-m);border:1px solid var(--fir-2);background:var(--fir);padding:0 12px">
+      ${c.date !== today() ? `<button class="linkbtn" data-action="lgToday">Tonight</button>` : ""}</div>
+      ${ly !== cur ? `<p class="muted small" style="margin-top:8px">Counts towards ${ly} only. This season's stats and plan won't change.</p>` : ""}</div>
+    <div class="blk"><h3>${f ? (f.tier === "undecided" ? "Your rating" : "Your rating (change it if you like)") : "Your rating"}</h3><div class="choices">${TIERS.map(t =>
+      `<button class="choice" data-lgtier="${t.id}" aria-pressed="${c.tier === t.id}"><span class="dot" style="--c:${t.c}"></span>${esc(t.name)}</button>`).join("")}</div></div>
+    <div class="blk"><h3>Where you watched it</h3><div class="choices">${SERVICES.map(sv =>
+      `<button class="choice" data-lgsvc="${esc(sv)}" aria-pressed="${c.service === sv}">${esc(sv)}</button>`).join("")}</div></div>
+    <div class="blk" style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn primary" data-action="lgSave">${f ? "Log watch and save rating" : "Add to my films and log watch"}</button>
+      <button class="btn" data-action="lgRateOnly">${f ? "Save rating only" : "Add to my films without logging a watch"}</button></div>`, "Log a watch");
+}
+function saveLog(logIt){
+  const c = sheetCtx; let f = c.filmId ? byId(c.filmId) : null; let isNew = false;
+  if (!f){
+    const m = c.movie; if (!m || !m.title) return toast("Still loading film details. Try again in a moment.");
+    f = {id:"t" + m.id, title:m.title, tier:c.tier, service:c.service || "Other", watches:[], tmdbId:null, poster:null, year:null, genres:[], overview:"", notes:"", searchQuery:m.title, searchYear:null};
+    applyMovie(f, m); data.films.push(f); isNew = true;
+  }
+  const prev = {tier:f.tier, service:f.service};
+  f.tier = c.tier; f.service = c.service || f.service || "Other";
+  const date = c.date;
+  if (logIt){ f.watches.push(date); f.watches.sort(); delete data.skips[f.id]; }
+  touch(); closeSheet(); render();
+  const y = seasonOf(date), parts = [];
+  if (logIt) parts.push(y === season().year ? `Logged ${f.title}` : `Logged ${f.title} for ${y}`); else parts.push(isNew ? `Added ${f.title}` : `Saved ${f.title}`);
+  if (prev.tier !== f.tier || isNew) parts.push(TIER[f.tier].name);
+  toast(parts.join(", "), () => {
+    if (isNew){ data.films = data.films.filter(x => x !== f); }
+    else { f.tier = prev.tier; f.service = prev.service; if (logIt){ const i = f.watches.lastIndexOf(date); if (i > -1) f.watches.splice(i, 1); } }
+    touch(); render();
+  });
+}
+
 /* ---------------- render + events ---------------- */
 function render(){
   renderCount();
@@ -908,10 +1036,20 @@ document.addEventListener("click", async e => {
     sheetCtx.logDate = y === season().year ? today() : `${y}-12-15`;
     return drawFilm();
   }
+  if (d.logpick) return openLogFilm({filmId:d.logpick});
+  if (d.logtmdb) return openLogFilm({tmdbId:+d.logtmdb});
+  if (d.lgtier){ sheetCtx.tier = d.lgtier; return drawLogFilm(); }
+  if (d.lgsvc){ sheetCtx.service = d.lgsvc; return drawLogFilm(); }
+  if (d.lgyear){ const y = +d.lgyear; sheetCtx.date = y === season().year ? today() : `${y}-12-15`; return drawLogFilm(); }
   if (d.addtier){ sheetCtx.tier = d.addtier; return drawAdd(); }
   if (d.addsvc){ sheetCtx.service = d.addsvc; return drawAdd(); }
   switch (d.action){
     case "settings": return openSettings();
+    case "openLog": return openLog();
+    case "logBack": { const bk = sheetCtx.back; openLog(); if (bk){ sheetCtx.q = bk.q; sheetCtx.tmdb = bk.tmdb; const i = document.getElementById("logQ"); i.value = bk.q; drawLogResults(); } return; }
+    case "lgToday": sheetCtx.date = today(); return drawLogFilm();
+    case "lgSave": return saveLog(true);
+    case "lgRateOnly": return saveLog(false);
     case "logwatch": {
       const v = document.getElementById("watchDate").value || today(); const f = byId(sheetCtx.id);
       f.watches.push(v); f.watches.sort(); touch(); render();
@@ -971,9 +1109,11 @@ document.addEventListener("click", async e => {
   }
 });
 document.addEventListener("input", e => {
+  if (e.target.id === "logQ" && sheetCtx && sheetCtx.kind === "log") onLogQuery(e.target.value);
+  if (e.target.id === "lgDate" && sheetCtx && e.target.value){ sheetCtx.date = e.target.value; const ly = seasonOf(e.target.value); if (ly !== sheetCtx._ly){ sheetCtx._ly = ly; drawLogFilm(); } }
   if (e.target.id === "watchDate" && sheetCtx){ sheetCtx.logDate = e.target.value; sheetCtx.logYear = e.target.value ? seasonOf(e.target.value) : null; }
   if (e.target.id === "libQ"){ ui.libQuery = e.target.value; render(); }
-  if (e.target.id === "notes" && sheetCtx){ const f = byId(sheetCtx.id); f.notes = e.target.value; data.updatedAt = new Date().toISOString(); store.set("cfc.data", data); schedulePush(); }
+  if (e.target.id === "notes" && sheetCtx && sheetCtx.kind === "film"){ const f = byId(sheetCtx.id); f.notes = e.target.value; data.updatedAt = new Date().toISOString(); store.set("cfc.data", data); schedulePush(); }
 });
 document.addEventListener("change", e => {
   if (e.target.id === "seasonStart"){ data.seasonStart = e.target.value; touch(); render(); }
