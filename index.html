@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Christmas Film Countdown</title>
+<meta name="theme-color" content="#0E2A2B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Film Countdown">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Young+Serif&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#0E2A2B; --fir:#1D4B45; --fir-2:#255a53; --frost:#EAF2EF; --frost-dim:#a9c2bc;
+  --gold:#E2B65A; --red:#B3243B; --plum:#6A2F52;
+  --t-elite:#E2B65A; --t-top:#D2475C; --t-xmas:#5FB38A; --t-badgood:#B572A0;
+  --t-winter:#8EC5E6; --t-undecided:#9aa9a6; --t-dwa:#5d6b69;
+  --r-s:6px; --r-m:12px; --r-l:20px;
+  --serif:"Young Serif", Georgia, serif;
+  --sans:"Atkinson Hyperlegible", system-ui, -apple-system, sans-serif;
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--night);color:var(--frost);font-family:var(--sans);font-size:17px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;padding-bottom:calc(76px + var(--safe-b))}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:4px}
+.wrap{max-width:560px;margin:0 auto;padding:0 18px}
+h1,h2,h3{font-family:var(--serif);font-weight:400;margin:0;line-height:1.15}
+h2{font-size:1.5rem}
+h3{font-size:1.15rem}
+p{margin:0}
+.muted{color:var(--frost-dim)}
+.small{font-size:.86rem}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:linear-gradient(var(--night) 70%,rgba(14,42,43,0));padding:calc(14px + var(--safe-t)) 0 14px}
+.top .wrap{display:flex;align-items:center;gap:12px}
+.count{flex:1}
+.count b{font-family:var(--serif);font-weight:400;font-size:2.4rem;color:var(--gold);line-height:1;margin-right:.3rem}
+.count span{font-size:1rem}
+.iconbtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--fir-2);background:transparent;display:grid;place-items:center}
+.iconbtn svg{width:22px;height:22px}
+.iconbtn{position:relative}
+.sync-dot{position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;background:var(--t-undecided);border:2px solid var(--night)}
+.sync-dot.ok{background:var(--t-xmas)} .sync-dot.err{background:var(--red)} .sync-dot.busy{background:var(--gold)}
+
+/* tonight */
+.tonight{position:relative;margin-top:6px;border-radius:var(--r-l);background:var(--fir);overflow:hidden;display:grid;grid-template-columns:132px 1fr;gap:16px;padding:16px}
+.tonight .poster{width:132px;aspect-ratio:2/3;border-radius:var(--r-m)}
+.tonight .pp{border:0;padding:0;background:none;align-self:start}
+.tonight .date{font-size:.9rem;color:var(--gold)}
+.tonight h2{margin:4px 0 8px}
+.tonight .why{font-size:.92rem;color:var(--frost-dim);margin-top:8px}
+.tonight .acts{grid-column:1/-1;display:flex;gap:10px}
+.tonight.done{grid-template-columns:72px 1fr}
+.tonight.done .poster{width:72px}
+.btn{min-height:48px;padding:0 18px;border-radius:999px;border:1px solid var(--fir-2);background:transparent;font-weight:700}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:#2a1d05}
+.btn.red{background:var(--red);border-color:var(--red);color:#fff}
+.btn.grow{flex:1}
+.btn:disabled{opacity:.5}
+.linkbtn{background:none;border:0;color:var(--gold);padding:6px 0;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+
+.poster{display:block;background:var(--fir-2) center/cover no-repeat;position:relative;overflow:hidden;flex:none}
+.poster img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;display:block}
+.poster .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:8px;font-family:var(--serif);font-size:.8rem;line-height:1.15;color:var(--frost);background:repeating-linear-gradient(135deg,var(--fir-2) 0 10px,#2a6158 10px 20px)}
+
+/* pills */
+.tier{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;font-weight:700;padding:3px 10px 3px 8px;border-radius:999px;background:rgba(255,255,255,.07);white-space:nowrap}
+.tier::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
+.svc{display:inline-block;font-size:.82rem;color:var(--frost-dim);border:1px solid var(--fir-2);border-radius:999px;padding:2px 9px;white-space:nowrap}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 2px;scrollbar-width:none;margin:18px -18px 0;padding-left:18px;padding-right:18px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:40px;padding:0 15px;border-radius:999px;border:1px solid var(--fir-2);background:transparent;font-size:.92rem}
+.chip[aria-pressed="true"]{background:var(--frost);color:var(--night);border-color:var(--frost);font-weight:700}
+.chip .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:7px;vertical-align:1px}
+
+/* advent grid */
+.section-h{display:flex;align-items:baseline;justify-content:space-between;margin:28px 0 12px;gap:10px}
+.advent{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media (min-width:430px){.advent{grid-template-columns:repeat(5,1fr)}}
+.door{position:relative;border-radius:var(--r-s);background:var(--fir);border:0;padding:0;aspect-ratio:2/3;overflow:hidden;text-align:left}
+.door .poster{position:absolute;inset:0;width:100%;height:100%}
+.door .num{position:absolute;left:0;top:0;z-index:2;font-family:var(--serif);font-size:1.25rem;line-height:1;padding:6px 8px 8px 7px;background:var(--night);border-bottom-right-radius:var(--r-s);color:var(--frost)}
+.door .num small{display:block;font-family:var(--sans);font-size:.62rem;color:var(--frost-dim);margin-top:2px}
+.door .stack{position:absolute;right:5px;bottom:5px;z-index:2;background:var(--night);border-radius:999px;font-size:.72rem;font-weight:700;padding:1px 7px}
+.door .band{position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--c);z-index:2}
+.door.xmas-day{outline:2px solid var(--gold);outline-offset:-2px}
+.door.xmas-day .num{background:var(--gold);color:#2a1d05}
+.door.xmas-day .num small{color:#5a4410}
+.door.empty{background:transparent;border:1px dashed var(--fir-2)}
+.door.past{opacity:.35}
+
+.progress{height:8px;border-radius:999px;background:var(--fir);overflow:hidden;margin-top:10px}
+.progress i{display:block;height:100%;background:var(--gold);border-radius:999px}
+
+/* lists */
+.list{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;padding:10px 0;border:0;background:none;text-align:left;width:100%;border-bottom:1px solid rgba(255,255,255,.06)}
+.row .poster{width:52px;aspect-ratio:2/3;border-radius:var(--r-s)}
+.row .t{font-weight:700;line-height:1.25}
+.row .s{font-size:.86rem;color:var(--frost-dim);margin-top:3px}
+.tick{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--t-xmas);color:var(--night)}
+.tick svg{width:16px;height:16px}
+.group-h{display:flex;align-items:center;gap:10px;margin:26px 0 4px}
+.group-h .bar{width:4px;align-self:stretch;border-radius:4px;background:var(--c)}
+.group-h h3{flex:1}
+
+.search{display:flex;gap:8px;margin-top:6px}
+.search input{flex:1;min-width:0;min-height:50px;border-radius:999px;border:1px solid var(--fir-2);background:var(--fir);padding:0 20px}
+.search input::placeholder{color:var(--frost-dim)}
+
+.card{background:var(--fir);border-radius:var(--r-m);padding:16px}
+.card + .card{margin-top:10px}
+.empty-state{padding:26px 18px;text-align:center;border:1px dashed var(--fir-2);border-radius:var(--r-m);margin-top:16px}
+.empty-state p + .btn{margin-top:14px}
+
+/* stats */
+.bignums{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bignums div{background:var(--fir);border-radius:var(--r-m);padding:14px 12px}
+.bignums b{display:block;font-family:var(--serif);font-weight:400;font-size:2rem;line-height:1;color:var(--gold)}
+.bignums span{font-size:.84rem;color:var(--frost-dim)}
+.bars{display:flex;flex-direction:column;gap:10px}
+.barrow{display:grid;grid-template-columns:112px 1fr 38px;align-items:center;gap:10px;font-size:.92rem}
+.barrow .track{height:14px;border-radius:999px;background:var(--fir);overflow:hidden}
+.barrow .track i{display:block;height:100%;background:var(--c,var(--gold));border-radius:999px}
+.barrow .n{text-align:right;font-weight:700}
+.warn{border-left:4px solid var(--red)}
+
+/* nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(10,32,33,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.06);padding-bottom:var(--safe-b)}
+nav.tabs .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+nav.tabs a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 8px;color:var(--frost-dim);text-decoration:none;font-size:.78rem}
+nav.tabs a svg{width:24px;height:24px}
+nav.tabs a[aria-current="page"]{color:var(--gold)}
+
+/* sheet */
+.scrim{position:fixed;inset:0;z-index:50;background:rgba(3,14,14,.6);display:none}
+.scrim.open{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:51;max-height:92vh;overflow:auto;background:var(--night);border-top-left-radius:var(--r-l);border-top-right-radius:var(--r-l);border-top:1px solid var(--fir-2);transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);padding-bottom:calc(20px + var(--safe-b))}
+.sheet.open{transform:none}
+.sheet .wrap{padding-top:10px}
+.sheetbar{position:sticky;top:0;z-index:3;display:flex;justify-content:center;align-items:center;height:44px;margin:-10px -18px 8px;background:var(--night)}
+.sheet .grab{width:44px;height:5px;border-radius:9px;background:var(--fir-2)}
+.sheetbar .close{position:absolute;right:14px;top:4px}
+.sheet .head{display:grid;grid-template-columns:110px 1fr;gap:16px;align-items:start}
+.sheet .head .poster{width:110px;aspect-ratio:2/3;border-radius:var(--r-m)}
+.sheet .blk{margin-top:22px}
+.sheet .blk > h3{margin-bottom:10px}
+.choices{display:flex;flex-wrap:wrap;gap:8px}
+.choice{min-height:42px;padding:0 14px;border-radius:999px;border:1px solid var(--fir-2);background:transparent;font-size:.92rem}
+.choice .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:7px;vertical-align:0}
+.choice[aria-pressed="true"]{background:var(--frost);color:var(--night);border-color:var(--frost);font-weight:700}
+.field{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.field label{font-size:.9rem;font-weight:700}
+.field input,.field textarea,.field select{min-height:48px;border-radius:var(--r-m);border:1px solid var(--fir-2);background:var(--fir);padding:10px 14px}
+.field textarea{min-height:80px;resize:vertical}
+.inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.inline input{flex:1;min-width:140px}
+.watch-log{display:flex;flex-direction:column}
+.watch-log div{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.x{width:36px;height:36px;border-radius:50%;border:1px solid var(--fir-2);background:transparent;display:grid;place-items:center}
+.x svg{width:14px;height:14px}
+.steps{margin:10px 0 0;padding-left:22px}
+.steps li{margin-bottom:6px}
+.status{font-size:.88rem;margin-top:8px;color:var(--frost-dim)}
+.status.err{color:#ff8f9c}
+
+.toast{position:fixed;left:50%;bottom:calc(88px + var(--safe-b));transform:translate(-50%,20px);opacity:0;z-index:60;background:var(--frost);color:var(--night);border-radius:999px;padding:10px 10px 10px 18px;display:flex;gap:12px;align-items:center;font-weight:700;transition:.2s;pointer-events:none;max-width:calc(100% - 28px)}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toast button{flex:none;border:0;background:var(--night);color:var(--frost);border-radius:999px;padding:6px 14px;font-weight:700}
+
+.open-door{animation:door .6s cubic-bezier(.2,.8,.2,1) both;transform-origin:left center}
+@keyframes door{from{transform:perspective(700px) rotateY(-70deg);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.open-door{animation:none}.sheet,.toast{transition:none}}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="count" id="count"></div>
+  <button class="iconbtn" id="settingsBtn" aria-label="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+  <span class="sync-dot" id="syncDot" aria-hidden="true"></span></button>
+</div></header>
+
+<main class="wrap" id="view"></main>
+
+<nav class="tabs" aria-label="Main"><div class="wrap">
+  <a href="#tonight" data-tab="tonight"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.5l2.6 5.6 6 .7-4.5 4.1 1.2 6-5.3-3-5.3 3 1.2-6L3.4 8.8l6-.7z"/></svg>Tonight</a>
+  <a href="#films" data-tab="films"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>My films</a>
+  <a href="#discover" data-tab="discover"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/></svg>Find films</a>
+  <a href="#stats" data-tab="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>Stats</a>
+</div></nav>
+
+<div class="scrim" id="scrim"></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Details"><div class="wrap"><div class="sheetbar"><span class="grab"></span><button class="x close" id="sheetClose" aria-label="Close">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div id="sheetBody"></div></div></section>
+<div class="toast" id="toast" role="status"><span id="toastMsg"></span><button id="toastBtn" class="hidden">Undo</button></div>
+
+<script>
+"use strict";
+/* ---------------- constants ---------------- */
+const SEED = [{"id":"faboycalledchristmas","title":"A Boy Called Christmas","sheetName":"A Boy Called Christmas","tier":"xmas","service":"Sky","searchQuery":"A Boy Called Christmas","searchYear":2021,"watches":["2024-12-07"]},{"id":"fachristmascarol","title":"A Christmas Carol","sheetName":"A Christmas Carol","tier":"xmas","service":"Netflix","searchQuery":"A Christmas Carol","searchYear":null,"watches":[]},{"id":"fachristmasprince","title":"A Christmas Prince","sheetName":"A Christmas Prince","tier":"badgood","service":"Netflix","searchQuery":"A Christmas Prince","searchYear":2017,"watches":["2023-12-08"]},{"id":"fachristmasprince2","title":"A Christmas Prince 2","sheetName":"A Christmas Prince 2","tier":"badgood","service":"Netflix","searchQuery":"A Christmas Prince: The Royal Wedding","searchYear":2018,"watches":["2023-12-08"]},{"id":"fachristmasprince3","title":"A Christmas Prince 3","sheetName":"A Christmas Prince 3","tier":"badgood","service":"Netflix","searchQuery":"A Christmas Prince: The Royal Baby","searchYear":2019,"watches":["2023-12-08"]},{"id":"farthurchristmas","title":"Arthur Christmas","sheetName":"Arthur Christmas","tier":"top","service":"Sky","searchQuery":"Arthur Christmas","searchYear":2011,"watches":["2023-12-21","2024-12-09","2024-12-16"]},{"id":"fchristmaschronicals","title":"The Christmas Chronicles","sheetName":"Christmas Chronicals","tier":"top","service":"Netflix","searchQuery":"The Christmas Chronicles","searchYear":2018,"watches":[]},{"id":"fchristmaschronicals2","title":"The Christmas Chronicles 2","sheetName":"Christmas Chronicals 2","tier":"xmas","service":"Netflix","searchQuery":"The Christmas Chronicles: Part Two","searchYear":2020,"watches":[]},{"id":"fchristmasinheritance","title":"Christmas Inheritance","sheetName":"Christmas Inheritance","tier":"badgood","service":"Netflix","searchQuery":"Christmas Inheritance","searchYear":2017,"watches":["2023-12-09","2024-12-16"]},{"id":"fdeckthehalls","title":"Deck the Halls","sheetName":"Deck the Halls","tier":"dwa","service":"Netflix","searchQuery":"Deck the Halls","searchYear":2006,"watches":["2024-12-02"]},{"id":"felf","title":"Elf","sheetName":"Elf","tier":"elite","service":"Netflix","searchQuery":"Elf","searchYear":2003,"watches":[]},{"id":"ffallingforchristmas","title":"Falling for Christmas","sheetName":"Falling for Christmas","tier":"badgood","service":"Netflix","searchQuery":"Falling for Christmas","searchYear":2022,"watches":["2023-12-08","2024-12-05"]},{"id":"ffourchristmases","title":"Four Christmases","sheetName":"Four Christmases","tier":"top","service":"Sky","searchQuery":"Four Christmases","searchYear":2008,"watches":[]},{"id":"ffredclaus","title":"Fred Claus","sheetName":"Fred Claus","tier":"undecided","service":"Other","searchQuery":"Fred Claus","searchYear":2007,"watches":[]},{"id":"ffrozen","title":"Frozen","sheetName":"Frozen","tier":"winter","service":"Disney+","searchQuery":"Frozen","searchYear":2013,"watches":["2023-12-21"]},{"id":"ffrozen2","title":"Frozen 2","sheetName":"Frozen 2","tier":"winter","service":"Disney+","searchQuery":"Frozen II","searchYear":2019,"watches":["2023-12-21","2024-11-16"]},{"id":"fholidate","title":"Holidate","sheetName":"Holidate","tier":"winter","service":"Netflix","searchQuery":"Holidate","searchYear":2020,"watches":[]},{"id":"fhomealone","title":"Home Alone","sheetName":"Home Alone","tier":"elite","service":"Sky","searchQuery":"Home Alone","searchYear":1990,"watches":[]},{"id":"fjackfrost","title":"Jack Frost","sheetName":"Jack Frost","tier":"undecided","service":"Other","searchQuery":"Jack Frost","searchYear":1998,"watches":[]},{"id":"fklaus","title":"Klaus","sheetName":"Klaus","tier":"elite","service":"Netflix","searchQuery":"Klaus","searchYear":2019,"watches":["2024-12-23"]},{"id":"flastchristmas","title":"Last Christmas","sheetName":"Last Christmas","tier":"xmas","service":"Sky","searchQuery":"Last Christmas","searchYear":2019,"watches":[]},{"id":"fletitsnow","title":"Let It Snow","sheetName":"Let it Snow","tier":"xmas","service":"Netflix","searchQuery":"Let It Snow","searchYear":2019,"watches":["2023-12-21"]},{"id":"floveactually","title":"Love Actually","sheetName":"Love Actually","tier":"elite","service":"Sky","searchQuery":"Love Actually","searchYear":2003,"watches":[]},{"id":"fmickeyschristmascarol","title":"Mickey's Christmas Carol","sheetName":"Mickey's Christmas Carol","tier":"xmas","service":"Disney+","searchQuery":"Mickey's Christmas Carol","searchYear":1983,"watches":[]},{"id":"fmickeysonceuponachristma","title":"Mickey's Once Upon a Christmas","sheetName":"Mickey's Once Upon a Christmas","tier":"elite","service":"Disney+","searchQuery":"Mickey's Once Upon a Christmas","searchYear":1999,"watches":[]},{"id":"fmickeystwiceuponachristm","title":"Mickey's Twice Upon a Christmas","sheetName":"Mickey's Twice Upon a Christmas","tier":"top","service":"Disney+","searchQuery":"Mickey's Twice Upon a Christmas","searchYear":2004,"watches":[]},{"id":"fnativity","title":"Nativity!","sheetName":"Nativity !","tier":"top","service":"Sky","searchQuery":"Nativity!","searchYear":2009,"watches":[]},{"id":"fnativity2","title":"Nativity 2!","sheetName":"Nativity 2 !","tier":"xmas","service":"Sky","searchQuery":"Nativity 2: Danger in the Manger!","searchYear":2012,"watches":[]},{"id":"fnativity3","title":"Nativity 3!","sheetName":"Nativity 3 !","tier":"badgood","service":"Sky","searchQuery":"Nativity 3: Dude, Where's My Donkey?!","searchYear":2014,"watches":[]},{"id":"fnoelle","title":"Noelle","sheetName":"Noelle","tier":"xmas","service":"Disney+","searchQuery":"Noelle","searchYear":2019,"watches":["2023-12-08","2024-12-01"]},{"id":"fofficechristmasparty","title":"Office Christmas Party","sheetName":"Office Christmas Party","tier":"badgood","service":"Netflix","searchQuery":"Office Christmas Party","searchYear":2016,"watches":[]},{"id":"fpolarexpress","title":"The Polar Express","sheetName":"Polar Express","tier":"top","service":"Sky","searchQuery":"The Polar Express","searchYear":2004,"watches":["2024-12-07"]},{"id":"fscroogeachristmascarol","title":"Scrooge: A Christmas Carol","sheetName":"Scrooge: A Christmas Carol","tier":"xmas","service":"Netflix","searchQuery":"Scrooge: A Christmas Carol","searchYear":2022,"watches":["2024-12-10"]},{"id":"ftheclausefamily","title":"The Claus Family","sheetName":"The Clause Family","tier":"undecided","service":"Netflix","searchQuery":"The Claus Family","searchYear":2020,"watches":[]},{"id":"ftheclausefamily2","title":"The Claus Family 2","sheetName":"The Clause Family 2","tier":"undecided","service":"Netflix","searchQuery":"The Claus Family 2","searchYear":2021,"watches":[]},{"id":"fthegrinch","title":"The Grinch","sheetName":"The Grinch","tier":"elite","service":"Netflix","searchQuery":"How the Grinch Stole Christmas","searchYear":2000,"watches":[]},{"id":"fthegrinchanimated","title":"The Grinch Animated","sheetName":"The Grinch Animated","tier":"xmas","service":"Netflix","searchQuery":"The Grinch","searchYear":2018,"watches":["2023-12-08","2024-12-10"]},{"id":"ftheholiday","title":"The Holiday","sheetName":"The Holiday","tier":"elite","service":"Sky","searchQuery":"The Holiday","searchYear":2006,"watches":["2023-12-21"]},{"id":"ftheholidaycalender","title":"The Holiday Calendar","sheetName":"The Holiday Calender","tier":"undecided","service":"Netflix","searchQuery":"The Holiday Calendar","searchYear":2018,"watches":[]},{"id":"ftheknightbeforechristmas","title":"The Knight Before Christmas","sheetName":"The Knight Before Christmas","tier":"badgood","service":"Netflix","searchQuery":"The Knight Before Christmas","searchYear":2019,"watches":["2023-12-08"]},{"id":"fthenoeldiary","title":"The Noel Diary","sheetName":"The Noel Diary","tier":"undecided","service":"Netflix","searchQuery":"The Noel Diary","searchYear":2022,"watches":[]},{"id":"ftheprincessswitch","title":"The Princess Switch","sheetName":"The Princess Switch","tier":"badgood","service":"Netflix","searchQuery":"The Princess Switch","searchYear":2018,"watches":["2023-12-08"]},{"id":"ftheprincessswitch2","title":"The Princess Switch 2","sheetName":"The Princess Switch 2","tier":"badgood","service":"Netflix","searchQuery":"The Princess Switch: Switched Again","searchYear":2020,"watches":["2023-12-08"]},{"id":"ftheprincessswitch3","title":"The Princess Switch 3","sheetName":"The Princess Switch 3","tier":"badgood","service":"Netflix","searchQuery":"The Princess Switch 3: Romancing the Star","searchYear":2021,"watches":["2023-12-09"]},{"id":"fthesantaclause","title":"The Santa Clause","sheetName":"The Santa Clause","tier":"elite","service":"Disney+","searchQuery":"The Santa Clause","searchYear":1994,"watches":["2023-12-09","2024-12-23"]},{"id":"fthesantaclause2","title":"The Santa Clause 2","sheetName":"The Santa Clause 2","tier":"elite","service":"Disney+","searchQuery":"The Santa Clause 2","searchYear":2002,"watches":["2023-12-09"]},{"id":"fthesantaclause3","title":"The Santa Clause 3","sheetName":"The Santa Clause 3","tier":"top","service":"Disney+","searchQuery":"The Santa Clause 3: The Escape Clause","searchYear":2006,"watches":[]},{"id":"fmiracleon34thstreet","title":"Miracle on 34th Street","sheetName":"Miracle On 34th Street","tier":"xmas","service":"Other","searchQuery":"Miracle on 34th Street","searchYear":1994,"watches":[]},{"id":"fchristmaswiththecoopers","title":"Christmas with the Coopers","sheetName":"Christmas with the Coopers","tier":"undecided","service":"Netflix","searchQuery":"Love the Coopers","searchYear":2015,"watches":[]},{"id":"fthestoryofchristmas","title":"The Story of Christmas","sheetName":"The Story of Christmas","tier":"undecided","service":"Amazon Prime","searchQuery":"The Story of Christmas","searchYear":null,"watches":[]},{"id":"fsinglealltheway","title":"Single All the Way","sheetName":"Single All the Way","tier":"badgood","service":"Netflix","searchQuery":"Single All the Way","searchYear":2021,"watches":["2023-12-08"]},{"id":"flittlewomen","title":"Little Women","sheetName":"Little Women","tier":"winter","service":"Netflix","searchQuery":"Little Women","searchYear":2019,"watches":["2024-12-15","2025-11-15"]},{"id":"fknivesout","title":"Knives Out","sheetName":"Knives Out","tier":"winter","service":"Amazon Prime","searchQuery":"Knives Out","searchYear":2019,"watches":["2024-12-15","2025-11-15"]},{"id":"fharrypotter","title":"Harry Potter","sheetName":"Harry Potter","tier":"winter","service":"Netflix","searchQuery":"Harry Potter and the Philosopher's Stone","searchYear":2001,"watches":[]},{"id":"fbridgetjones1","title":"Bridget Jones's Diary","sheetName":"Bridget Jones 1","tier":"winter","service":"Sky","searchQuery":"Bridget Jones's Diary","searchYear":2001,"watches":["2024-12-02"]},{"id":"fnutcrackers","title":"Nutcrackers","sheetName":"Nutcrackers","tier":"xmas","service":"Disney+","searchQuery":"Nutcrackers","searchYear":2024,"watches":["2024-12-02"]},{"id":"fyourchristmasormine","title":"Your Christmas or Mine?","sheetName":"Your Christmas or Mine","tier":"xmas","service":"Amazon Prime","searchQuery":"Your Christmas or Mine?","searchYear":2022,"watches":["2024-12-05"]},{"id":"fyourchristmasormine2","title":"Your Christmas or Mine 2","sheetName":"Your Christmas or Mine 2","tier":"xmas","service":"Amazon Prime","searchQuery":"Your Christmas or Mine 2","searchYear":2023,"watches":["2024-12-09"]},{"id":"fourlittlesecret","title":"Our Little Secret","sheetName":"Our Little Secret","tier":"badgood","service":"Netflix","searchQuery":"Our Little Secret","searchYear":2024,"watches":["2024-12-09"]},{"id":"fchaletgirl","title":"Chalet Girl","sheetName":"Chalet Girl","tier":"winter","service":"Amazon Prime","searchQuery":"Chalet Girl","searchYear":2011,"watches":[]},{"id":"fthatchristmas","title":"That Christmas","sheetName":"That Christmas","tier":"top","service":"Netflix","searchQuery":"That Christmas","searchYear":2024,"watches":["2024-12-16","2024-12-16"]},{"id":"fchampagneproblems","title":"Champagne Problems","sheetName":"Champagne Problems","tier":"badgood","service":"Netflix","searchQuery":"Champagne Problems","searchYear":2025,"watches":["2025-11-24"]},{"id":"fjinglebellheist","title":"Jingle Bell Heist","sheetName":"Jingle Bell Heist","tier":"undecided","service":"Netflix","searchQuery":"Jingle Bell Heist","searchYear":2025,"watches":["2025-12-06"]},{"id":"fthefamilystone","title":"The Family Stone","sheetName":"The Family Stone","tier":"undecided","service":"Other","searchQuery":"The Family Stone","searchYear":2005,"watches":["2025-12-06"]}];
+const SEED_TIME = "2000-01-01T00:00:00.000Z";
+const TIERS = [
+  {id:"elite", name:"Elite", c:"var(--t-elite)"},
+  {id:"top", name:"Top", c:"var(--t-top)"},
+  {id:"xmas", name:"Christmas Vibe", c:"var(--t-xmas)"},
+  {id:"badgood", name:"Bad but good", c:"var(--t-badgood)"},
+  {id:"winter", name:"Winter Vibe", c:"var(--t-winter)"},
+  {id:"undecided", name:"Undecided", c:"var(--t-undecided)"},
+  {id:"dwa", name:"Don't watch again", c:"var(--t-dwa)"},
+];
+const TIER = Object.fromEntries(TIERS.map(t => [t.id, t]));
+// Countdown order: worst-but-watchable first, Elite saved for the run-in to Christmas. Don't-watch-again never planned.
+const PLAN_ORDER = ["undecided","badgood","winter","xmas","top","elite"];
+const SERVICES = ["Netflix","Sky","Disney+","Amazon Prime","Other"];
+const WHY = {
+  undecided:"Not rated yet. Watch it, then give it a tier.",
+  badgood:"Bad but good. Early-season comfort viewing.",
+  winter:"Winter vibe. Cosy before the full Christmas run.",
+  xmas:"Christmas vibe. The build-up is on.",
+  top:"Top tier. Getting close now.",
+  elite:"Elite. Saved for the nights before Christmas.",
+};
+const GIST_DESC = "Christmas Film Countdown data";
+const GIST_FILE = "christmas-films.json";
+const IMG = "https://image.tmdb.org/t/p/";
+
+/* ---------------- storage ---------------- */
+const store = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+function freshData(){
+  return { schema:1, updatedAt:SEED_TIME, tmdbKey:"", seasonStart:"11-15", hidden:[], skips:{},
+    films: SEED.map(f => ({...f, watches:[...f.watches], tmdbId:null, poster:null, year:f.searchYear||null, genres:[], overview:"", notes:""})) };
+}
+let data = store.get("cfc.data", null) || freshData();
+let secrets = store.get("cfc.secrets", {ghToken:"", gistId:""});
+let cache = store.get("cfc.cache", {newRel:null, providers:{}, genres:null});
+function saveCache(){ store.set("cfc.cache", cache); }
+function saveSecrets(){ store.set("cfc.secrets", secrets); }
+function touch(){ data.updatedAt = new Date().toISOString(); store.set("cfc.data", data); schedulePush(); }
+
+/* ---------------- dates ---------------- */
+const pad = n => String(n).padStart(2,"0");
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+const addDays = (s,n) => { const d = parse(s); d.setDate(d.getDate()+n); return iso(d); };
+const diffDays = (a,b) => Math.round((parse(b) - parse(a)) / 864e5);
+function today(){
+  const q = new URLSearchParams(location.search).get("today");
+  return q && /^\d{4}-\d\d-\d\d$/.test(q) ? q : iso(new Date());
+}
+const fmt = (s, o={weekday:"short", day:"numeric", month:"short"}) => parse(s).toLocaleDateString("en-GB", o);
+
+/* Season runs July→June so a December season isn't split by New Year. */
+function season(t = today()){
+  const y = +t.slice(0,4), md = t.slice(5);
+  const startMD = data.seasonStart || "11-15";
+  if (md <= "01-05") return {mode:"after", year:y-1, end:`${y}-01-05`};
+  if (md >= "12-26") return {mode:"after", year:y, end:`${y+1}-01-05`};
+  if (md < startMD) return {mode:"before", year:y, start:`${y}-${startMD}`, end:`${y}-12-25`};
+  return {mode:"on", year:y, start:t, end:`${y}-12-25`};
+}
+const inSeason = (w, yr) => w >= `${yr}-07-01` && w <= `${yr+1}-06-30`;
+const watchedThisSeason = (f, yr = season().year) => f.watches.some(w => inSeason(w, yr));
+const lastWatch = f => f.watches.length ? f.watches[f.watches.length-1] : null;
+
+/* ---------------- planning ---------------- */
+function rankWithinTier(a, b){
+  // films you've come back to most often first, then the longest since last watch
+  if (b.watches.length !== a.watches.length) return b.watches.length - a.watches.length;
+  const la = lastWatch(a) || "", lb = lastWatch(b) || "";
+  if (la !== lb) return la < lb ? -1 : 1;
+  return a.title.localeCompare(b.title);
+}
+function buildPlan(service = ui.service){
+  const t = today(), s = season(t);
+  let pool, order, start, end;
+  if (s.mode === "after"){
+    order = ["winter"]; start = t; end = s.end;
+  } else {
+    order = PLAN_ORDER; start = s.mode === "before" ? s.start : t; end = s.end;
+  }
+  pool = data.films.filter(f => order.includes(f.tier) && !watchedThisSeason(f, s.year) && (!service || f.service === service));
+  const skipToday = f => data.skips[f.id] === t;
+  pool.sort((a,b) => (order.indexOf(a.tier) - order.indexOf(b.tier)) || rankWithinTier(a,b));
+  // films skipped tonight move to the back of their tier
+  pool.sort((a,b) => (order.indexOf(a.tier) - order.indexOf(b.tier)) || (skipToday(a) - skipToday(b)));
+  const days = Math.max(1, diffDays(start, end) + 1);
+  // Running out of nights? Keep the best films (max 2 a night) and drop the lowest tiers first.
+  const capacity = days * 2;
+  let dropped = 0;
+  if (pool.length > capacity){
+    dropped = pool.length - capacity;
+    pool = pool.slice(dropped);
+  }
+  const slots = Array.from({length:days}, (_, i) => ({date:addDays(start, i), films:[]}));
+  const n = pool.length;
+  pool.forEach((f, i) => { slots[Math.min(days-1, Math.floor(i * days / n))].films.push(f); });
+  return {season:s, start, end, days, slots, pool, dropped};
+}
+
+/* ---------------- TMDB ---------------- */
+async function tmdb(path, params = {}){
+  const key = (data.tmdbKey || "").trim();
+  if (!key) throw new Error("Add your TMDB key in Settings first.");
+  const u = new URL("https://api.themoviedb.org/3" + path);
+  const headers = {accept:"application/json"};
+  if (key.length > 60) headers.Authorization = "Bearer " + key; else u.searchParams.set("api_key", key);
+  u.searchParams.set("language", "en-GB");
+  for (const [k,v] of Object.entries(params)) if (v != null && v !== "") u.searchParams.set(k, v);
+  const r = await fetch(u, {headers});
+  if (r.status === 401) throw new Error("TMDB didn't accept that key. Check it in Settings.");
+  if (!r.ok) throw new Error("TMDB request failed (" + r.status + ").");
+  return r.json();
+}
+function applyMovie(f, m){
+  f.tmdbId = m.id; f.poster = m.poster_path || null;
+  f.year = m.release_date ? +m.release_date.slice(0,4) : f.year;
+  f.genres = m.genre_ids || (m.genres || []).map(g => g.id);
+  f.overview = m.overview || "";
+}
+async function findMatch(f){
+  const q = f.searchQuery || f.title;
+  let r = await tmdb("/search/movie", {query:q, year:f.searchYear || ""});
+  if (!r.results.length && f.searchYear) r = await tmdb("/search/movie", {query:q});
+  return r.results[0] || null;
+}
+async function matchAll(onProgress){
+  const todo = data.films.filter(f => !f.tmdbId);
+  let done = 0, missed = [];
+  for (const f of todo){
+    try { const m = await findMatch(f); if (m) applyMovie(f, m); else missed.push(f.title); }
+    catch (e){ if (/key/.test(e.message)) throw e; missed.push(f.title); }
+    done++; onProgress && onProgress(done, todo.length);
+    await new Promise(r => setTimeout(r, 120));
+  }
+  touch();
+  return missed;
+}
+const PROVIDER_MAP = [[/netflix/i,"Netflix"],[/disney/i,"Disney+"],[/amazon|prime video/i,"Amazon Prime"],[/sky|now tv|^now$/i,"Sky"]];
+async function providers(tmdbId){
+  const c = cache.providers[tmdbId];
+  if (c && Date.now() - c.at < 3 * 864e5) return c.list;
+  const r = await tmdb(`/movie/${tmdbId}/watch/providers`);
+  const gb = (r.results && r.results.GB) || {};
+  const list = (gb.flatrate || []).map(p => p.provider_name);
+  cache.providers[tmdbId] = {at:Date.now(), list}; saveCache();
+  return list;
+}
+function mapService(list){
+  for (const name of list) for (const [re, s] of PROVIDER_MAP) if (re.test(name)) return s;
+  return "Other";
+}
+async function genreNames(){
+  if (cache.genres) return cache.genres;
+  const r = await tmdb("/genre/movie/list");
+  cache.genres = Object.fromEntries(r.genres.map(g => [g.id, g.name])); saveCache();
+  return cache.genres;
+}
+
+/* New releases: this year's Christmas films, ranked against what you rate highly */
+async function loadNewReleases(force){
+  const t = today(), yr = season(t).year;
+  if (!force && cache.newRel && cache.newRel.day === t && cache.newRel.year === yr) return cache.newRel.items;
+  const names = await genreNames();
+  const kwIds = [];
+  for (const q of ["christmas", "santa claus", "christmas eve"]){
+    const k = await tmdb("/search/keyword", {query:q});
+    const hit = k.results.find(x => x.name.toLowerCase() === q);
+    if (hit) kwIds.push(hit.id);
+  }
+  const found = new Map();
+  for (const page of [1,2,3]){
+    const r = await tmdb("/discover/movie", {with_keywords:kwIds.join("|"), "primary_release_date.gte":`${yr}-01-01`,
+      "primary_release_date.lte":`${yr}-12-31`, sort_by:"popularity.desc", include_adult:"false", page});
+    r.results.forEach(m => found.set(m.id, m));
+    if (page >= r.total_pages) break;
+  }
+  // taste profile from your tiers
+  const W = {elite:3, top:2, xmas:1.5, badgood:1, winter:.5, undecided:0, dwa:-2};
+  const prof = {};
+  data.films.forEach(f => (f.genres || []).forEach(g => prof[g] = (prof[g] || 0) + (W[f.tier] || 0)));
+  const maxP = Math.max(1, ...Object.values(prof));
+  // "people who liked your favourites also liked..."
+  const fav = data.films.filter(f => f.tmdbId && (f.tier === "elite" || f.tier === "top")).sort(rankWithinTier).slice(0, 8);
+  const recHits = {};
+  for (const f of fav){
+    try {
+      const r = await tmdb(`/movie/${f.tmdbId}/recommendations`);
+      r.results.forEach(m => (recHits[m.id] = recHits[m.id] || []).push(f.title));
+    } catch {}
+  }
+  const mine = new Set(data.films.map(f => f.tmdbId).filter(Boolean));
+  const items = [...found.values()].filter(m => !mine.has(m.id)).map(m => {
+    const g = m.genre_ids || [];
+    const taste = g.length ? g.reduce((s, id) => s + (prof[id] || 0), 0) / g.length / maxP : 0;
+    const recs = recHits[m.id] || [];
+    const score = taste * 10 + recs.length * 6 + Math.log10(1 + (m.popularity || 0)) * 2 + (m.vote_average || 0) * .3;
+    let reason;
+    if (recs.length) reason = "Recommended for fans of " + recs.slice(0,2).join(" and ");
+    else {
+      const top = g.filter(id => prof[id] > 0).sort((a,b) => prof[b] - prof[a]).slice(0,2).map(id => names[id]).filter(Boolean);
+      reason = top.length ? top.join(" and ") + ", like the films you rate highly" : "New Christmas release this year";
+    }
+    return {id:m.id, title:m.title, year:m.release_date ? +m.release_date.slice(0,4) : yr, release:m.release_date || "",
+      poster:m.poster_path, overview:m.overview, genre_ids:g, score, reason};
+  }).sort((a,b) => b.score - a.score);
+  cache.newRel = {day:t, year:yr, items}; saveCache();
+  return items;
+}
+
+/* ---------------- GitHub Gist sync ---------------- */
+let pushTimer = null, syncState = "off", syncMsg = "Not set up";
+function setSync(state, msg){
+  syncState = state; syncMsg = msg;
+  const dot = document.getElementById("syncDot");
+  dot.className = "sync-dot " + ({ok:"ok", err:"err", busy:"busy"}[state] || "");
+  const el = document.getElementById("syncStatus");
+  if (el){ el.textContent = msg; el.className = "status" + (state === "err" ? " err" : ""); }
+}
+async function gh(path, opts = {}){
+  const r = await fetch("https://api.github.com" + path, {...opts, headers:{
+    Authorization:"Bearer " + secrets.ghToken, Accept:"application/vnd.github+json", "Content-Type":"application/json"}});
+  if (r.status === 401) throw new Error("GitHub didn't accept that token.");
+  if (!r.ok) throw new Error("GitHub request failed (" + r.status + ").");
+  return r.json();
+}
+async function readRemote(){
+  const g = await gh("/gists/" + secrets.gistId);
+  const f = g.files && g.files[GIST_FILE];
+  if (!f) return null;
+  const text = f.truncated ? await (await fetch(f.raw_url)).text() : f.content;
+  return JSON.parse(text);
+}
+async function push(){
+  await gh("/gists/" + secrets.gistId, {method:"PATCH", body:JSON.stringify({files:{[GIST_FILE]:{content:JSON.stringify(data)}}})});
+}
+async function syncNow(firstLink = false){
+  if (!secrets.ghToken){ setSync("off", "Not set up"); return; }
+  setSync("busy", "Syncing…");
+  try {
+    let adopted = false;
+    if (!secrets.gistId){
+      const list = await gh("/gists?per_page=100");
+      const g = list.find(x => x.description === GIST_DESC);
+      if (g){ secrets.gistId = g.id; firstLink = true; }
+      else {
+        const c = await gh("/gists", {method:"POST", body:JSON.stringify({description:GIST_DESC, public:false,
+          files:{[GIST_FILE]:{content:JSON.stringify(data)}}})});
+        secrets.gistId = c.id;
+      }
+      saveSecrets();
+    }
+    const remote = await readRemote();
+    if (remote && Array.isArray(remote.films) && (firstLink || remote.updatedAt > data.updatedAt)){
+      const key = data.tmdbKey;
+      data = remote; if (!data.tmdbKey && key) data.tmdbKey = key;
+      store.set("cfc.data", data); adopted = true;
+    } else if (!remote || remote.updatedAt < data.updatedAt){
+      await push();
+    }
+    setSync("ok", "Synced at " + new Date().toLocaleTimeString("en-GB", {hour:"2-digit", minute:"2-digit"}));
+    if (adopted) render();
+  } catch (e){ setSync("err", e.message); }
+}
+function schedulePush(){
+  if (!secrets.ghToken || !secrets.gistId) return;
+  clearTimeout(pushTimer);
+  setSync("busy", "Saving…");
+  pushTimer = setTimeout(async () => {
+    try { await push(); setSync("ok", "Synced at " + new Date().toLocaleTimeString("en-GB", {hour:"2-digit", minute:"2-digit"})); }
+    catch (e){ setSync("err", e.message); }
+  }, 1500);
+}
+
+/* ---------------- helpers ---------------- */
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const byId = id => data.films.find(f => f.id === id);
+function posterHTML(path, title, size = "w342", cls = ""){
+  const img = path ? `<img src="${IMG}${size}${esc(path)}" alt="" loading="lazy" onerror="this.remove()">` : "";
+  return `<span class="poster ${cls}"><span class="ph">${esc(title)}</span>${img}</span>`;
+}
+const tierPill = id => `<span class="tier" style="--c:${TIER[id].c}">${esc(TIER[id].name)}</span>`;
+const svcPill = s => s ? `<span class="svc">${esc(s)}</span>` : "";
+const check = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>`;
+const cross = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
+function watchedLine(f){
+  const n = f.watches.length;
+  if (!n) return "Never watched";
+  const lw = lastWatch(f);
+  return `Watched ${n === 1 ? "once" : n + " times"}, last ${fmt(lw, {month:"short", year:"numeric"})}`;
+}
+let toastTimer;
+function toast(msg, undo){
+  const t = document.getElementById("toast"), b = document.getElementById("toastBtn");
+  document.getElementById("toastMsg").textContent = msg;
+  b.classList.toggle("hidden", !undo);
+  b.onclick = () => { undo(); t.classList.remove("show"); };
+  t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), undo ? 6000 : 3000);
+}
+
+/* ---------------- actions ---------------- */
+function markWatched(f, date = today()){
+  f.watches.push(date); f.watches.sort();
+  delete data.skips[f.id];
+  touch(); render();
+  toast(`Logged ${f.title}`, () => { const i = f.watches.lastIndexOf(date); if (i > -1) f.watches.splice(i,1); touch(); render(); });
+  if (f.tier === "undecided") setTimeout(() => openFilm(f.id, {rate:true}), 450);
+}
+function skipTonight(f){
+  data.skips[f.id] = today(); touch(); render();
+  toast(`${f.title} moved later`, () => { delete data.skips[f.id]; touch(); render(); });
+}
+
+/* ---------------- UI state ---------------- */
+const ui = { statsYear:null, service:"", tierFilter:"", libQuery:"", searchQ:"", searchRes:null, searchErr:"", newRel:null, newRelErr:"", newRelBusy:false };
+const view = () => (location.hash.replace("#","") || "tonight");
+
+function renderCount(){
+  const t = today(), s = season(t), el = document.getElementById("count");
+  const n = diffDays(t, `${s.mode === "after" ? +t.slice(0,4) + (t.slice(5) >= "12-26" ? 1 : 0) : s.year}-12-25`);
+  if (s.mode === "after") el.innerHTML = `<b>${fmt(t, {day:"numeric"})}</b><span>${t.slice(5) <= "01-05" ? "of January" : "of December"}, winter films</span>`;
+  else if (n === 0) el.innerHTML = `<b>25</b><span>It's Christmas Day</span>`;
+  else el.innerHTML = `<b>${n}</b><span>${n === 1 ? "night" : "nights"} to Christmas</span>`;
+}
+
+function renderTonight(){
+  const t = today(), plan = buildPlan(), s = plan.season;
+  const watchedToday = data.films.filter(f => f.watches.includes(t));
+  const first = plan.slots.find(x => x.films.length);
+  const pick = first ? first.films[0] : null;
+  let hero = "";
+  if (watchedToday.length){
+    const f = watchedToday[watchedToday.length-1];
+    hero += `<div class="tonight done open-door">${posterHTML(f.poster, f.title, "w185")}
+      <div><p class="date">Watched tonight</p><h3 style="margin-top:4px">${esc(f.title)}</h3>
+      <div class="meta" style="margin-top:8px">${tierPill(f.tier)}</div></div></div>`;
+  }
+  if (pick){
+    const isTonight = first.date === t;
+    const label = s.mode === "before" ? `The countdown starts ${fmt(plan.start, {day:"numeric", month:"long"})}. First up:`
+      : isTonight ? (watchedToday.length ? "Still up for another?" : "Tonight's film") : `Next up, planned for ${fmt(first.date)}`;
+    hero += `<article class="tonight ${watchedToday.length ? "" : "open-door"}" style="${watchedToday.length ? "margin-top:10px" : ""}">
+      <button class="pp" data-open="${pick.id}" aria-label="Details for ${esc(pick.title)}">${posterHTML(pick.poster, pick.title)}</button>
+      <div><p class="date">${esc(label)}</p><h2>${esc(pick.title)}</h2>
+        <div class="meta">${tierPill(pick.tier)} ${svcPill(pick.service)}</div>
+        <p class="why">${esc(WHY[pick.tier] || "")}</p></div>
+      <div class="acts"><button class="btn primary grow" data-watch="${pick.id}">Mark as watched</button>
+        <button class="btn" data-skip="${pick.id}">Not tonight</button></div></article>`;
+  } else if (!watchedToday.length){
+    hero = `<div class="empty-state"><h3>${s.mode === "after" ? "Winter films all watched" : "Everything's watched this season"}</h3>
+      <p class="muted" style="margin-top:6px">${ui.service ? "Nothing left on " + esc(ui.service) + ". Try another service." : "Find a new film to add to the list."}</p>
+      ${ui.service ? "" : `<a class="btn primary" style="display:inline-flex;align-items:center;margin-top:14px;text-decoration:none" href="#discover">Find films</a>`}</div>`;
+  }
+  const chips = `<div class="chips" role="group" aria-label="Streaming service">${["", ...SERVICES].map(s =>
+    `<button class="chip" data-svc="${esc(s)}" aria-pressed="${ui.service === s}">${s || "All services"}</button>`).join("")}</div>`;
+
+  const total = data.films.filter(f => PLAN_ORDER.includes(f.tier) && (!ui.service || f.service === ui.service)).length;
+  const done = data.films.filter(f => PLAN_ORDER.includes(f.tier) && (!ui.service || f.service === ui.service) && watchedThisSeason(f, s.year)).length;
+  let cal = "";
+  if (s.mode !== "after"){
+    cal = `<div class="section-h"><h2>Road to Christmas</h2><span class="muted small">${done} of ${total} watched</span></div>
+      <div class="progress" aria-hidden="true"><i style="width:${total ? Math.round(done/total*100) : 0}%"></i></div>
+      <p class="muted small" style="margin-top:10px">${plan.pool.length} films over ${plan.days} ${plan.days === 1 ? "night" : "nights"}, building up to Elite.${plan.dropped ? ` ${plan.dropped} lower-tier films don't fit before Christmas, so they've been left out.` : ""}</p>
+      <div class="advent" style="margin-top:14px">${plan.slots.map(sl => door(sl)).join("")}</div>`;
+  } else if (plan.pool.length){
+    cal = `<div class="section-h"><h2>Winter films to finish</h2></div><div class="list">${plan.pool.map(rowHTML).join("")}</div>`;
+  }
+  return hero + chips + cal;
+}
+function door(sl){
+  const d = parse(sl.date), xmas = sl.date.slice(5) === "12-25";
+  const f = sl.films[0];
+  const num = `<span class="num">${d.getDate()}<small>${d.toLocaleDateString("en-GB", {weekday:"short"})}</small></span>`;
+  if (!f) return `<div class="door empty ${xmas ? "xmas-day" : ""}" aria-label="${fmt(sl.date)}: free night">${num}</div>`;
+  const label = `${fmt(sl.date)}: ${sl.films.map(x => x.title).join(", ")}`;
+  return `<button class="door ${xmas ? "xmas-day" : ""}" style="--c:${TIER[f.tier].c}" ${sl.films.length > 1 ? `data-day="${sl.date}"` : `data-open="${f.id}"`} aria-label="${esc(label)}">
+    ${posterHTML(f.poster, f.title, "w185")}${num}${sl.films.length > 1 ? `<span class="stack">+${sl.films.length-1}</span>` : ""}<span class="band"></span></button>`;
+}
+function rowHTML(f){
+  const done = watchedThisSeason(f);
+  return `<button class="row" data-open="${f.id}">${posterHTML(f.poster, f.title, "w92")}
+    <span><span class="t">${esc(f.title)}</span><span class="s" style="display:block">${f.year ? f.year + ", " : ""}${esc(f.service || "")}. ${esc(watchedLine(f))}</span></span>
+    ${done ? `<span class="tick" title="Watched this season">${check}</span>` : "<span></span>"}</button>`;
+}
+
+function renderFilms(){
+  const q = ui.libQuery.trim().toLowerCase();
+  const chips = `<div class="chips" style="margin-top:12px" role="group" aria-label="Tier">${[{id:"", name:"All tiers"}, ...TIERS].map(t =>
+    `<button class="chip" data-tierf="${t.id}" aria-pressed="${ui.tierFilter === t.id}">${t.id ? `<span class="dot" style="--c:${t.c}"></span>` : ""}${esc(t.name)}</button>`).join("")}</div>`;
+  let out = `<h2 style="margin-top:4px">My films</h2>
+    <div class="search" style="margin-top:14px"><input id="libQ" type="search" placeholder="Search your ${data.films.length} films" value="${esc(ui.libQuery)}" aria-label="Search your films"></div>${chips}`;
+  const unmatched = data.films.filter(f => !f.tmdbId).length;
+  if (unmatched && data.tmdbKey) out += `<div class="card" style="margin-top:16px"><p>${unmatched} films don't have posters yet.</p><button class="linkbtn" data-action="match">Find posters on TMDB</button></div>`;
+  else if (unmatched && !data.tmdbKey) out += `<div class="card" style="margin-top:16px"><p>Add a free TMDB key to get posters, film details and new-release suggestions.</p><button class="linkbtn" data-action="settings">Open settings</button></div>`;
+  let any = false;
+  for (const t of TIERS){
+    if (ui.tierFilter && ui.tierFilter !== t.id) continue;
+    const films = data.films.filter(f => f.tier === t.id && (!q || f.title.toLowerCase().includes(q))).sort((a,b) => a.title.localeCompare(b.title));
+    if (!films.length) continue;
+    any = true;
+    const seen = films.filter(f => watchedThisSeason(f)).length;
+    out += `<div class="group-h" style="--c:${t.c}"><span class="bar"></span><h3>${esc(t.name)}</h3><span class="muted small">${seen}/${films.length} this season</span></div>
+      <div class="list">${films.map(rowHTML).join("")}</div>`;
+  }
+  if (!any) out += `<div class="empty-state"><p>No films match "${esc(ui.libQuery)}".</p><a class="btn primary" style="display:inline-flex;align-items:center;margin-top:14px;text-decoration:none" href="#discover">Search TMDB instead</a></div>`;
+  return out;
+}
+
+function renderDiscover(){
+  let out = `<h2 style="margin-top:4px">Find films</h2>`;
+  if (!data.tmdbKey){
+    return out + `<div class="empty-state" style="text-align:left"><h3>Connect TMDB to search films</h3>
+      <p class="muted" style="margin-top:8px">TMDB is a free film database with posters and release dates. You need a key once; it takes about two minutes.</p>
+      <button class="btn primary" style="margin-top:14px" data-action="settings">Add TMDB key</button></div>`;
+  }
+  out += `<form class="search" id="tmdbForm" style="margin-top:14px"><input id="tmdbQ" type="search" placeholder="Search any film" value="${esc(ui.searchQ)}" aria-label="Search TMDB" enterkeyhint="search"><button class="btn primary">Search</button></form>`;
+  if (ui.searchErr) out += `<p class="status err">${esc(ui.searchErr)}</p>`;
+  if (ui.searchRes){
+    out += ui.searchRes.length ? `<div class="list" style="margin-top:8px">${ui.searchRes.map(m => tmdbRow(m)).join("")}</div>`
+      : `<p class="muted" style="margin-top:12px">No films found for "${esc(ui.searchQ)}". Check the spelling or try fewer words.</p>`;
+  }
+  const yr = season().year;
+  out += `<div class="section-h"><h2>New this year</h2><button class="linkbtn" data-action="refreshNew">Refresh</button></div>
+    <p class="muted small">${yr} Christmas releases, ranked by how close they are to your Elite and Top films.</p>`;
+  if (ui.newRelErr) out += `<p class="status err">${esc(ui.newRelErr)}</p>`;
+  if (ui.newRelBusy && !ui.newRel) out += `<p class="muted" style="margin-top:14px">Checking this year's releases…</p>`;
+  if (ui.newRel){
+    const items = ui.newRel.filter(m => !data.hidden.includes(m.id) && !data.films.some(f => f.tmdbId === m.id)).slice(0, 20);
+    out += items.length ? `<div class="list" style="margin-top:6px">${items.map(m => tmdbRow(m, true)).join("")}</div>`
+      : `<p class="muted" style="margin-top:12px">You've added or hidden every new release so far. Check back as more come out.</p>`;
+  } else if (!ui.newRelBusy && !ui.newRelErr) { setTimeout(fetchNew, 0); }
+  return out;
+}
+function tmdbRow(m, suggestion){
+  const have = data.films.find(f => f.tmdbId === m.id);
+  const yr = m.year || (m.release_date ? m.release_date.slice(0,4) : "");
+  const sub = suggestion ? m.reason : (m.overview || "").slice(0, 90) + ((m.overview || "").length > 90 ? "…" : "");
+  const rel = suggestion && m.release && m.release > today() ? `Out ${fmt(m.release, {day:"numeric", month:"short"})}. ` : "";
+  return `<button class="row" data-tmdb="${m.id}" ${suggestion ? 'data-sugg="1"' : ""}>${posterHTML(m.poster || m.poster_path, m.title, "w92")}
+    <span><span class="t">${esc(m.title)}${yr ? ` (${yr})` : ""}</span><span class="s" style="display:block">${esc(rel + sub)}</span></span>
+    ${have ? `<span class="tick" title="In your films">${check}</span>` : `<span class="svc">Add</span>`}</button>`;
+}
+async function fetchNew(force){
+  if (ui.newRelBusy) return;
+  ui.newRelBusy = true; ui.newRelErr = "";
+  if (force) { ui.newRel = null; render(); }
+  try { ui.newRel = await loadNewReleases(force); }
+  catch (e){ ui.newRelErr = e.message; }
+  ui.newRelBusy = false;
+  if (view() === "discover") render();
+}
+
+const seasonOf = w => { const y = +w.slice(0,4); return w.slice(5) < "07-01" ? y-1 : y; };
+function seasonYears(){
+  const cur = season().year;
+  const ys = new Set(data.films.flatMap(f => f.watches.map(seasonOf)));
+  ys.add(cur);
+  return [...ys].filter(y => y <= cur).sort((a,b) => b - a);
+}
+function renderStats(){
+  const cur = season().year, years = seasonYears();
+  const yr = years.includes(ui.statsYear) ? ui.statsYear : cur;
+  const isCur = yr === cur;
+  const watchedIn = f => watchedThisSeason(f, yr);
+  const perYear = [...years].sort().map(y => [y, data.films.reduce((n, f) => n + f.watches.filter(w => inSeason(w, y)).length, 0)]);
+  const maxY = Math.max(1, ...perYear.map(x => x[1]));
+  const seen = data.films.filter(watchedIn);
+  const nights = data.films.reduce((n, f) => n + f.watches.filter(w => inSeason(w, yr)).length, 0);
+  const elite = data.films.filter(f => f.tier === "elite");
+  const eliteSeen = elite.filter(watchedIn).length;
+  const missing = data.films.filter(f => (f.tier === "elite" || f.tier === "top") && !watchedIn(f))
+    .sort((a,b) => (a.tier === b.tier ? rankWithinTier(a,b) : a.tier === "elite" ? -1 : 1));
+  const most = [...data.films].sort((a,b) => b.watches.length - a.watches.length).filter(f => f.watches.length > 1).slice(0, 5);
+
+  let out = `<h2 style="margin-top:4px">${isCur ? "This season" : yr + " season"}</h2>
+    <div class="chips" style="margin-top:10px" role="group" aria-label="Season">${years.map(y =>
+      `<button class="chip" data-year="${y}" aria-pressed="${y === yr}">${y === cur ? y + " (now)" : y}</button>`).join("")}</div>
+    <p class="muted small" style="margin-top:10px">A season runs from July to June, so a film watched on New Year's Day still counts towards that Christmas. Only ${yr} watches are counted here.</p>
+    <div class="bignums" style="margin-top:14px"><div><b>${nights}</b><span>films watched</span></div>
+    <div><b>${seen.length}</b><span>different films</span></div>
+    <div><b>${isCur ? elite.length - eliteSeen : eliteSeen + "/" + elite.length}</b><span>${isCur ? "Elite still to watch" : "Elite watched"}</span></div></div>`;
+  if (isCur && missing.length){
+    out += `<div class="card warn" style="margin-top:16px"><h3>Don't miss these</h3>
+      <p class="muted small" style="margin-top:4px">Elite and Top films you haven't watched this season.</p>
+      <div class="list" style="margin-top:6px">${missing.map(rowHTML).join("")}</div></div>`;
+  }
+  out += `<div class="section-h"><h2>By tier in ${yr}</h2></div><div class="bars">${TIERS.map(t => {
+    const all = data.films.filter(f => f.tier === t.id); if (!all.length) return "";
+    const w = all.filter(watchedIn).length;
+    return `<div class="barrow"><span>${esc(t.name)}</span><span class="track"><i style="--c:${t.c};width:${Math.round(w/all.length*100)}%"></i></span><span class="n">${w}/${all.length}</span></div>`;
+  }).join("")}</div>`;
+  if (!isCur){
+    const list = seen.sort((a,b) => TIERS.findIndex(t => t.id === a.tier) - TIERS.findIndex(t => t.id === b.tier) || a.title.localeCompare(b.title));
+    out += `<div class="section-h"><h2>Watched in ${yr}</h2><span class="muted small">${list.length} films</span></div>
+      ${list.length ? `<div class="list">${list.map(f => seasonRow(f, yr)).join("")}</div>` : `<p class="muted">Nothing logged for ${yr}.</p>`}`;
+  }
+  out += `<div class="section-h"><h2>Films watched per season</h2></div><div class="bars">${perYear.map(([y,n]) =>
+    `<div class="barrow"><span>${y}</span><span class="track"><i style="width:${Math.round(n/maxY*100)}%;${y === yr ? "" : "opacity:.45"}"></i></span><span class="n">${n}</span></div>`).join("")}</div>`;
+  if (isCur && most.length) out += `<div class="section-h"><h2>Most rewatched</h2></div><div class="list">${most.map(rowHTML).join("")}</div>`;
+  return out;
+}
+function seasonRow(f, yr){
+  const ws = f.watches.filter(w => inSeason(w, yr));
+  return `<button class="row" data-open="${f.id}">${posterHTML(f.poster, f.title, "w92")}
+    <span><span class="t">${esc(f.title)}</span><span class="s" style="display:block">${esc(TIER[f.tier].name)}. ${ws.length > 1 ? ws.length + " times" : "Once"}, ${ws.map(w => fmt(w, {day:"numeric", month:"short"})).join(" and ")}</span></span><span></span></button>`;
+}
+
+/* ---------------- sheets ---------------- */
+function openSheet(html, label){
+  document.getElementById("sheetBody").innerHTML = html;
+  const sh = document.getElementById("sheet");
+  sh.setAttribute("aria-label", label || "Details");
+  document.getElementById("scrim").classList.add("open"); sh.classList.add("open");
+  sh.scrollTop = 0;
+}
+function closeSheet(){
+  document.getElementById("scrim").classList.remove("open"); document.getElementById("sheet").classList.remove("open");
+  sheetCtx = null;
+}
+let sheetCtx = null;
+
+function openFilm(id, opts = {}){
+  const f = byId(id); if (!f) return;
+  sheetCtx = {kind:"film", id, rate:!!opts.rate, confirmDelete:false};
+  drawFilm();
+  if (f.tmdbId && data.tmdbKey) providers(f.tmdbId).then(list => {
+    const el = document.getElementById("provs");
+    if (el && sheetCtx && sheetCtx.id === id) el.textContent = list.length ? "Streaming in the UK on " + list.join(", ") + "." : "TMDB doesn't list a UK streaming service for this one right now.";
+  }).catch(() => {});
+}
+const seasonsFor = f => [...new Set(f.watches.map(seasonOf))].sort((a,b) => b - a);
+function drawFilm(){
+  const f = byId(sheetCtx.id); if (!f) return closeSheet();
+  const cur = season().year;
+  openSheet(`<div class="head">${posterHTML(f.poster, f.title)}
+    <div><h2>${esc(f.title)}</h2><p class="muted" style="margin-top:6px">${f.year || ""}</p>
+      <div class="meta" style="margin-top:10px">${tierPill(f.tier)} ${svcPill(f.service)}</div>
+      ${watchedThisSeason(f) ? `<p class="small" style="margin-top:10px;color:var(--t-xmas)">Watched this season</p>` : ""}</div></div>
+    ${f.overview ? `<p class="muted" style="margin-top:16px">${esc(f.overview)}</p>` : ""}
+    <p class="small muted" id="provs" style="margin-top:10px"></p>
+    <div class="blk"><h3>${sheetCtx.rate ? "How was it? Pick a tier" : "Tier"}</h3><div class="choices">${TIERS.map(t =>
+      `<button class="choice" data-settier="${t.id}" aria-pressed="${f.tier === t.id}"><span class="dot" style="--c:${t.c}"></span>${esc(t.name)}</button>`).join("")}</div></div>
+    <div class="blk"><h3>Where you watch it</h3><div class="choices">${SERVICES.map(s =>
+      `<button class="choice" data-setsvc="${esc(s)}" aria-pressed="${f.service === s}">${esc(s)}</button>`).join("")}</div></div>
+    <div class="blk"><h3>Log a watch</h3>
+      <div class="choices" role="group" aria-label="Which season">${[cur, cur-1, cur-2].map(y =>
+        `<button class="choice" data-logyear="${y}" aria-pressed="${sheetCtx.logYear === y}">${y === cur ? "This season" : y}</button>`).join("")}</div>
+      <div class="inline" style="margin-top:10px"><input type="date" id="watchDate" value="${sheetCtx.logDate || today()}" aria-label="Date watched" style="min-height:48px;border-radius:var(--r-m);border:1px solid var(--fir-2);background:var(--fir);padding:0 12px">
+      <button class="btn primary" data-action="logwatch">Log it</button></div>
+      <p class="muted small" style="margin-top:8px">${sheetCtx.logYear && sheetCtx.logYear !== cur ? `Counts towards ${sheetCtx.logYear} only. This season's stats and plan won't change.` : "Pick a past year to add a watch you forgot to log."}</p></div>
+    <div class="blk"><h3>Watch history</h3>
+      ${seasonsFor(f).length ? seasonsFor(f).map(y => `<p class="small" style="margin-top:10px;color:${y === cur ? "var(--gold)" : "var(--frost-dim)"}">${y === cur ? "This season" : y + " season"}</p>
+        <div class="watch-log">${f.watches.map((w, i) => [w, i]).filter(([w]) => seasonOf(w) === y).reverse().map(([w, i]) => `<div><span>${fmt(w, {weekday:"short", day:"numeric", month:"short", year:"numeric"})}</span>
+        <button class="x" data-unwatch="${i}" aria-label="Remove watch on ${w}">${cross}</button></div>`).join("")}</div>`).join("")
+        : `<p class="muted small" style="padding:8px 0">Not watched yet.</p>`}</div>
+    <div class="blk"><div class="field" style="margin-top:0"><label for="notes">Notes</label><textarea id="notes" placeholder="Who you watched it with, what to remember">${esc(f.notes || "")}</textarea></div></div>
+    <div class="blk inline">
+      ${data.tmdbKey ? `<button class="btn" data-action="rematch">${f.tmdbId ? "Wrong film? Change match" : "Find on TMDB"}</button>` : ""}
+      <button class="btn ${sheetCtx.confirmDelete ? "red" : ""}" data-action="delete">${sheetCtx.confirmDelete ? "Tap again to remove" : "Remove film"}</button>
+    </div>`, f.title);
+}
+
+function openRematch(){
+  const f = byId(sheetCtx.id);
+  sheetCtx = {kind:"rematch", id:f.id};
+  openSheet(`<h2>Match ${esc(f.title)}</h2><p class="muted small" style="margin-top:6px">Pick the right film so the poster and details are correct.</p>
+    <form class="search" id="rematchForm" style="margin-top:14px"><input id="rematchQ" type="search" value="${esc(f.searchQuery || f.title)}" aria-label="Search TMDB"><button class="btn primary">Search</button></form>
+    <div class="list" id="rematchList" style="margin-top:8px"><p class="muted" style="padding:10px 0">Searching…</p></div>`, "Change match");
+  runRematch(f.searchQuery || f.title);
+}
+async function runRematch(q){
+  const el = document.getElementById("rematchList");
+  try {
+    const r = await tmdb("/search/movie", {query:q});
+    sheetCtx.results = r.results.slice(0, 12);
+    el.innerHTML = sheetCtx.results.length ? sheetCtx.results.map(m => `<button class="row" data-pick="${m.id}">${posterHTML(m.poster_path, m.title, "w92")}
+      <span><span class="t">${esc(m.title)} ${m.release_date ? "(" + m.release_date.slice(0,4) + ")" : ""}</span><span class="s" style="display:block">${esc((m.overview || "").slice(0, 80))}</span></span><span></span></button>`).join("")
+      : `<p class="muted" style="padding:10px 0">No films found. Try a shorter title.</p>`;
+  } catch (e){ el.innerHTML = `<p class="status err">${esc(e.message)}</p>`; }
+}
+
+async function openAdd(tmdbId, fromSugg){
+  const m0 = (fromSugg ? (ui.newRel || []) : (ui.searchRes || [])).find(m => m.id === tmdbId) || {id:tmdbId};
+  const existing = data.films.find(f => f.tmdbId === tmdbId);
+  if (existing) return openFilm(existing.id);
+  sheetCtx = {kind:"add", tmdbId, tier:"undecided", service:"", movie:m0, list:null, fromSugg};
+  drawAdd();
+  try {
+    const [det, list] = await Promise.all([tmdb(`/movie/${tmdbId}`), providers(tmdbId)]);
+    if (!sheetCtx || sheetCtx.tmdbId !== tmdbId) return;
+    sheetCtx.movie = det; sheetCtx.list = list;
+    if (!sheetCtx.service) sheetCtx.service = mapService(list);
+    drawAdd();
+  } catch {}
+}
+function drawAdd(){
+  const c = sheetCtx, m = c.movie;
+  const title = m.title || "", poster = m.poster_path || m.poster, yr = m.release_date ? m.release_date.slice(0,4) : (m.year || "");
+  openSheet(`<div class="head">${posterHTML(poster, title)}
+    <div><h2>${esc(title)}</h2><p class="muted" style="margin-top:6px">${esc(yr)}${m.runtime ? `, ${m.runtime} min` : ""}</p>
+    ${c.list ? `<p class="small muted" style="margin-top:10px">${c.list.length ? "UK streaming: " + esc(c.list.join(", ")) : "Not on a UK streaming service right now"}</p>` : ""}</div></div>
+    ${m.overview ? `<p class="muted" style="margin-top:16px">${esc(m.overview)}</p>` : ""}
+    <div class="blk"><h3>Tier</h3><div class="choices">${TIERS.map(t =>
+      `<button class="choice" data-addtier="${t.id}" aria-pressed="${c.tier === t.id}"><span class="dot" style="--c:${t.c}"></span>${esc(t.name)}</button>`).join("")}</div>
+      <p class="muted small" style="margin-top:8px">Not seen it yet? Leave it as Undecided and it goes to the front of the countdown.</p></div>
+    <div class="blk"><h3>Where you'll watch it</h3><div class="choices">${SERVICES.map(s =>
+      `<button class="choice" data-addsvc="${esc(s)}" aria-pressed="${c.service === s}">${esc(s)}</button>`).join("")}</div></div>
+    <div class="blk inline"><button class="btn primary grow" data-action="add">Add to my films</button>
+      ${c.fromSugg ? `<button class="btn" data-action="hide">Not for me</button>` : ""}</div>`, "Add film");
+}
+
+function openSettings(){
+  sheetCtx = {kind:"settings", resetConfirm:false};
+  drawSettings();
+}
+function drawSettings(){
+  const unmatched = data.films.filter(f => !f.tmdbId).length;
+  openSheet(`<h2>Settings</h2>
+    <div class="blk"><h3>Film data from TMDB</h3>
+      <p class="muted small">Posters, search and new-release suggestions come from TMDB.</p>
+      <ol class="steps small muted"><li>Make a free account at <a href="https://www.themoviedb.org/signup" style="color:var(--gold)">themoviedb.org</a>.</li>
+      <li>Go to Settings, then API, and request a developer key (personal use is fine).</li>
+      <li>Copy the API Key or the Read Access Token and paste it here.</li></ol>
+      <div class="field"><label for="tmdbKey">TMDB key</label><input id="tmdbKey" autocomplete="off" spellcheck="false" value="${esc(data.tmdbKey)}" placeholder="Paste your key"></div>
+      <div class="inline" style="margin-top:10px"><button class="btn primary" data-action="saveTmdb">Save key</button>
+      ${data.tmdbKey && unmatched ? `<button class="btn" data-action="match">Find posters for ${unmatched} films</button>` : ""}</div>
+      <p class="status" id="tmdbStatus"></p></div>
+
+    <div class="blk"><h3>Sync between phone and laptop</h3>
+      <p class="muted small">Your list is saved to a private GitHub Gist, so every device shows the same films.</p>
+      <ol class="steps small muted"><li>Sign in to GitHub and open <a href="https://github.com/settings/tokens/new?scopes=gist&description=Christmas%20Film%20Countdown" style="color:var(--gold)">new token</a>. Only the gist box needs ticking.</li>
+      <li>Set "Expiration" to "No expiration", create the token and paste it here.</li>
+      <li>Paste the same token on your other devices. They'll load the list from GitHub.</li></ol>
+      <div class="field"><label for="ghToken">GitHub token</label><input id="ghToken" type="password" autocomplete="off" value="${esc(secrets.ghToken)}" placeholder="ghp_…"></div>
+      <div class="inline" style="margin-top:10px"><button class="btn primary" data-action="saveGh">Save and sync</button>
+      ${secrets.ghToken ? `<button class="btn" data-action="syncNow">Sync now</button><button class="btn" data-action="unlink">Disconnect</button>` : ""}</div>
+      <p class="status ${syncState === "err" ? "err" : ""}" id="syncStatus">${esc(syncMsg)}</p></div>
+
+    <div class="blk"><h3>Countdown</h3>
+      <div class="field"><label for="seasonStart">Countdown starts on</label>
+      <select id="seasonStart">${[1,8,15,22].map(d => `<option value="11-${pad(d)}" ${data.seasonStart === "11-" + pad(d) ? "selected" : ""}>${d} November</option>`).join("")}
+        <option value="12-01" ${data.seasonStart === "12-01" ? "selected" : ""}>1 December</option></select></div></div>
+
+    <div class="blk"><h3>Backup</h3>
+      <p class="muted small">Download a copy of your list, or restore one.</p>
+      <div class="inline" style="margin-top:10px"><button class="btn" data-action="export">Download backup</button>
+      <label class="btn" style="display:inline-flex;align-items:center">Restore backup<input type="file" id="importFile" accept="application/json,.json" class="hidden"></label></div>
+      <button class="linkbtn" style="margin-top:14px;color:${sheetCtx.resetConfirm ? "#ff8f9c" : "var(--frost-dim)"}" data-action="reset">${sheetCtx.resetConfirm ? "Tap again to replace everything with the original sheet data" : "Start again from my original sheet"}</button></div>`, "Settings");
+}
+
+/* ---------------- render + events ---------------- */
+function render(){
+  renderCount();
+  const v = view();
+  document.querySelectorAll("nav.tabs a").forEach(a => a.dataset.tab === v ? a.setAttribute("aria-current","page") : a.removeAttribute("aria-current"));
+  const el = document.getElementById("view");
+  const focused = document.activeElement && document.activeElement.id;
+  el.innerHTML = v === "films" ? renderFilms() : v === "discover" ? renderDiscover() : v === "stats" ? renderStats() : renderTonight();
+  if (focused === "libQ"){ const i = document.getElementById("libQ"); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
+  if (sheetCtx && sheetCtx.kind === "film") drawFilm();
+}
+window.addEventListener("hashchange", () => { window.scrollTo(0,0); render(); });
+
+document.addEventListener("click", async e => {
+  const b = e.target.closest("button,[data-open]"); if (!b) return;
+  const d = b.dataset;
+  if (d.day){
+    const sl = buildPlan().slots.find(x => x.date === d.day); if (!sl) return;
+    sheetCtx = {kind:"day"};
+    return openSheet(`<h2>${fmt(d.day, {weekday:"long", day:"numeric", month:"long"})}</h2>
+      <p class="muted small" style="margin-top:6px">${sl.films.length} films planned for this night. Tap one for details.</p>
+      <div class="list" style="margin-top:8px">${sl.films.map(rowHTML).join("")}</div>`, "Night plan");
+  }
+  if (d.open) return openFilm(d.open);
+  if (d.watch) return markWatched(byId(d.watch));
+  if (d.skip) return skipTonight(byId(d.skip));
+  if (d.svc !== undefined && b.classList.contains("chip")){ ui.service = d.svc; return render(); }
+  if (d.tierf !== undefined){ ui.tierFilter = d.tierf; return render(); }
+  if (d.tmdb) return openAdd(+d.tmdb, !!d.sugg);
+  if (d.settier){ const f = byId(sheetCtx.id); f.tier = d.settier; touch(); if (sheetCtx.rate){ closeSheet(); toast(`${f.title} is now ${TIER[f.tier].name}`); render(); return; } return render(); }
+  if (d.setsvc){ const f = byId(sheetCtx.id); f.service = d.setsvc; touch(); return render(); }
+  if (d.unwatch !== undefined){ const f = byId(sheetCtx.id); f.watches.splice(+d.unwatch, 1); touch(); return render(); }
+  if (d.pick){
+    const m = sheetCtx.results.find(x => x.id === +d.pick), f = byId(sheetCtx.id);
+    applyMovie(f, m); touch(); openFilm(f.id); render(); return;
+  }
+  if (d.year){ ui.statsYear = +d.year; return render(); }
+  if (d.logyear){
+    const y = +d.logyear; sheetCtx.logYear = y;
+    sheetCtx.logDate = y === season().year ? today() : `${y}-12-15`;
+    return drawFilm();
+  }
+  if (d.addtier){ sheetCtx.tier = d.addtier; return drawAdd(); }
+  if (d.addsvc){ sheetCtx.service = d.addsvc; return drawAdd(); }
+  switch (d.action){
+    case "settings": return openSettings();
+    case "logwatch": {
+      const v = document.getElementById("watchDate").value || today(); const f = byId(sheetCtx.id);
+      f.watches.push(v); f.watches.sort(); touch(); render();
+      const y = seasonOf(v);
+      return toast(y === season().year ? `Logged ${f.title}` : `Logged ${f.title} for ${y}`, () => { const i = f.watches.lastIndexOf(v); if (i > -1) f.watches.splice(i, 1); touch(); render(); });
+    }
+    case "rematch": return openRematch();
+    case "delete": {
+      if (!sheetCtx.confirmDelete){ sheetCtx.confirmDelete = true; return drawFilm(); }
+      const i = data.films.findIndex(f => f.id === sheetCtx.id), [gone] = data.films.splice(i, 1);
+      closeSheet(); touch(); render();
+      return toast(`Removed ${gone.title}`, () => { data.films.splice(i, 0, gone); touch(); render(); });
+    }
+    case "add": {
+      const c = sheetCtx, m = c.movie;
+      const f = {id:"t" + m.id, title:m.title, tier:c.tier, service:c.service || "Other", watches:[], tmdbId:null, poster:null, year:null, genres:[], overview:"", notes:"", searchQuery:m.title, searchYear:null};
+      applyMovie(f, m); data.films.push(f); touch(); closeSheet(); render();
+      return toast(`Added ${f.title} as ${TIER[f.tier].name}`);
+    }
+    case "hide": data.hidden.push(sheetCtx.tmdbId); touch(); closeSheet(); render(); return;
+    case "refreshNew": return fetchNew(true);
+    case "saveTmdb": {
+      data.tmdbKey = document.getElementById("tmdbKey").value.trim(); touch();
+      const st = document.getElementById("tmdbStatus"); st.textContent = "Checking key…"; st.className = "status";
+      try { await tmdb("/configuration"); st.textContent = "Key works."; cache.newRel = null; saveCache(); ui.newRel = null; drawSettings(); document.getElementById("tmdbStatus").textContent = "Key works."; render(); }
+      catch (err){ st.textContent = err.message; st.className = "status err"; }
+      return;
+    }
+    case "match": {
+      const st = document.getElementById("tmdbStatus");
+      if (!st) { openSettings(); }
+      const s2 = document.getElementById("tmdbStatus");
+      b.disabled = true;
+      try {
+        const missed = await matchAll((n, t) => { s2.textContent = `Finding posters: ${n} of ${t}`; });
+        s2.textContent = missed.length ? `Done. No match for: ${missed.join(", ")}. Open those films to search by hand.` : "Done. Every film has a poster.";
+        render();
+      } catch (err){ s2.textContent = err.message; s2.className = "status err"; }
+      b.disabled = false; return;
+    }
+    case "saveGh": {
+      const tok = document.getElementById("ghToken").value.trim();
+      if (tok !== secrets.ghToken){ secrets.ghToken = tok; secrets.gistId = ""; saveSecrets(); }
+      return syncNow(true);
+    }
+    case "syncNow": return syncNow();
+    case "unlink": secrets = {ghToken:"", gistId:""}; saveSecrets(); setSync("off", "Not set up"); return drawSettings();
+    case "export": {
+      const blob = new Blob([JSON.stringify(data, null, 1)], {type:"application/json"});
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `christmas-films-${today()}.json`;
+      document.body.appendChild(a); a.click(); a.remove(); return;
+    }
+    case "reset": {
+      if (!sheetCtx.resetConfirm){ sheetCtx.resetConfirm = true; return drawSettings(); }
+      const key = data.tmdbKey; data = freshData(); data.tmdbKey = key; touch(); closeSheet(); render(); return toast("Back to your original sheet data");
+    }
+  }
+});
+document.addEventListener("input", e => {
+  if (e.target.id === "watchDate" && sheetCtx){ sheetCtx.logDate = e.target.value; sheetCtx.logYear = e.target.value ? seasonOf(e.target.value) : null; }
+  if (e.target.id === "libQ"){ ui.libQuery = e.target.value; render(); }
+  if (e.target.id === "notes" && sheetCtx){ const f = byId(sheetCtx.id); f.notes = e.target.value; data.updatedAt = new Date().toISOString(); store.set("cfc.data", data); schedulePush(); }
+});
+document.addEventListener("change", e => {
+  if (e.target.id === "seasonStart"){ data.seasonStart = e.target.value; touch(); render(); }
+  if (e.target.id === "importFile" && e.target.files[0]){
+    e.target.files[0].text().then(t => {
+      const d = JSON.parse(t); if (!Array.isArray(d.films)) throw new Error();
+      data = d; touch(); closeSheet(); render(); toast(`Restored ${d.films.length} films`);
+    }).catch(() => toast("That file isn't a Christmas Film Countdown backup"));
+  }
+});
+document.addEventListener("submit", async e => {
+  e.preventDefault();
+  if (e.target.id === "tmdbForm"){
+    ui.searchQ = document.getElementById("tmdbQ").value.trim(); if (!ui.searchQ) return;
+    ui.searchErr = "";
+    try { const r = await tmdb("/search/movie", {query:ui.searchQ}); ui.searchRes = r.results.slice(0, 15).map(m => ({...m, poster:m.poster_path})); }
+    catch (err){ ui.searchErr = err.message; ui.searchRes = null; }
+    render();
+  }
+  if (e.target.id === "rematchForm") runRematch(document.getElementById("rematchQ").value.trim());
+});
+document.getElementById("scrim").onclick = closeSheet;
+document.getElementById("sheetClose").onclick = closeSheet;
+document.getElementById("settingsBtn").onclick = openSettings;
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && secrets.ghToken) syncNow(); });
+
+render();
+if (secrets.ghToken) syncNow(); else setSync("off", "Not set up");
+if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
